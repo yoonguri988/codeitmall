@@ -1,15 +1,5 @@
-import { Geist, Geist_Mono } from "next/font/google";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import style from "@/styles/Home.module.css";
 
 export default function Home() {
-  return <>안녕 Next.js</>;
+  return <h1 className={style.title}>안녕 Next.js</h1>;
 }
