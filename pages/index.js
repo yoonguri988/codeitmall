@@ -1,3 +1,4 @@
+import SearchForm from "@/components/SearchForm";
 import style from "@/styles/Home.module.css";
 import Link from "next/link";
 
@@ -5,6 +6,7 @@ export default function Home() {
   return (
     <>
       <h1>codeitmall</h1>
+      <SearchForm />
       <ul>
         <li>
           <Link href="/products/1">첫번째 상품</Link>
