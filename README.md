@@ -4,3 +4,7 @@
 
 - default project
 - css 적용하기
+
+### 2024.12.24 issue
+
+- 페이지 나누기
