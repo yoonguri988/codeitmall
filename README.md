@@ -9,3 +9,8 @@
 - Link 컴포넌트
 - useRouter 쿼리 사용하기
 - useRouter 페이지 이동하기
+
+### 2024.12.24 issue
+
+- api 연동하기
+  1. css 적용하기
