@@ -21,3 +21,7 @@
 - 커스텀 404 페이지
 - 커스텀 APP와 Document
 - Context 활용하기
+
+### 2024.12.27 issue
+
+- CSS 전체 적용
