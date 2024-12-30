@@ -6,18 +6,8 @@ import SizeReviewList from "@/components/SizeReviewList";
 import StarRating from "@/components/StarRating";
 import Image from "next/image";
 import Spinner from "@/components/Spinner";
-import { notFound } from "next/navigation";
 
-export async function getStaticPaths() {
-  const res = await axios.get(`/products/`);
-  const products = res.data.results;
-  const paths = products.map((product) => ({
-    params: { id: String(product.id) },
-  }));
-  return { paths, fallback: true };
-}
-
-export async function getStaticProps(context) {
+export async function getServerSideProps(context) {
   const productId = context.params["id"];
   let product;
   try {
@@ -26,26 +16,14 @@ export async function getStaticProps(context) {
   } catch (e) {
     return { notFound: true };
   }
-  return { props: { product } };
+
+  const res = await axios.get(`/size_reviews/?product_id=${productId}`);
+  const sizeReviews = res.data.results ?? [];
+
+  return { props: { product, sizeReviews } };
 }
 
-export default function Product({ product }) {
-  const [sizeReviews, setSizeReviews] = useState([]);
-  const router = useRouter();
-  const { id } = router.query;
-
-  async function getSizeReviews(targetId) {
-    const res = await axios.get(`/size_reviews/?product_id=${targetId}`);
-    const nextSizeReviews = res.data.results ?? [];
-    setSizeReviews(nextSizeReviews);
-  }
-
-  useEffect(() => {
-    if (!id) return;
-
-    getSizeReviews(id);
-  }, [id]);
-
+export default function Product({ product, sizeReviews }) {
   if (!product) {
     return (
       <div className={styles.loading}>
