@@ -3,7 +3,7 @@ import sizeReviewLabels from "@/lib/sizeReviewLabels";
 import styles from "./SizeReviewList.module.css";
 
 export default function SizeReviewList({ sizeReviews }) {
-  if (!sizeReviews) return null;
+  if (sizeReviews == []) return null;
 
   return (
     <ul className={styles.sizeReviewList}>
