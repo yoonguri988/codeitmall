@@ -5,19 +5,13 @@ import ProductList from "@/components/ProductList";
 import SearchForm from "@/components/SearchForm";
 import Head from "next/head";
 
-export default function Home() {
-  const [products, setProducts] = useState();
+export async function getStaticProps() {
+  const res = await axios.get(`/products`);
+  const products = res.data.results;
+  return { props: { products } };
+}
 
-  async function getProducts() {
-    const res = await axios.get(`/products`);
-    const nextProducts = res.data.results;
-    setProducts(nextProducts);
-  }
-
-  useEffect(() => {
-    getProducts();
-  }, []);
-
+export default function Home({ products }) {
   return (
     <>
       <Head>
