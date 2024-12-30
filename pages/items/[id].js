@@ -6,6 +6,7 @@ import SizeReviewList from "@/components/SizeReviewList";
 import StarRating from "@/components/StarRating";
 import Image from "next/image";
 import Spinner from "@/components/Spinner";
+import Dropdown from "@/components/Dropdown";
 
 export async function getServerSideProps(context) {
   const productId = context.params["id"];
