@@ -5,33 +5,62 @@ import styles from "@/styles/Product.module.css";
 import SizeReviewList from "@/components/SizeReviewList";
 import StarRating from "@/components/StarRating";
 import Image from "next/image";
+import Spinner from "@/components/Spinner";
 
-export default function Product() {
-  const [product, setProduct] = useState();
-  const [sizeReviews, setSizeReviews] = useState([]);
-  const router = useRouter();
-  const { id } = router.query;
-
-  async function getProduct(targetId) {
-    const res = await axios.get(`/products/${targetId}`);
-    const nextProduct = res.data;
-    setProduct(nextProduct);
+export async function getServerSideProps(context) {
+  const productId = context.params["id"];
+  let product;
+  try {
+    const res = await axios.get(`/products/${productId}`);
+    product = res.data;
+  } catch (e) {
+    return { notFound: true };
   }
 
-  async function getSizeReviews(targetId) {
-    const res = await axios.get(`/size_reviews/?product_id=${targetId}`);
-    const nextSizeReviews = res.data.results ?? [];
-    setSizeReviews(nextSizeReviews);
-  }
+  const res = await axios.get(`/size_reviews/?product_id=${productId}`);
+  const sizeReviews = res.data.results ?? [];
 
-  useEffect(() => {
-    if (!id) return;
+  return { props: { product, sizeReviews } };
+}
 
-    getProduct(id);
-    getSizeReviews(id);
-  }, [id]);
+export default function Product({ product, sizeReviews: initialSizeReviews }) {
+  const [sizeReviews, setSizeReviews] = useState(initialSizeReviews);
+  const [formValue, setFromValue] = useState({
+    size: "M",
+    sex: "male",
+    height: 173,
+    fit: "good",
+  });
 
-  if (!product) return null;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const sizeReview = {
+      ...formValue,
+      productId: product.id,
+    };
+    const response = await axios.post("/size_reviews/", sizeReview);
+    const newSizeReview = response.data;
+    setSizeReviews((prevSizereviews) => [newSizeReview, ...prevSizereviews]);
+  };
+
+  const handleInputChange = async (e) => {
+    const { name, value } = e.target;
+    handleChange(name, value);
+  };
+
+  const handleChange = async (name, value) => {
+    setFromValue({
+      ...formValue,
+      [name]: value,
+    });
+  };
+
+  if (!product)
+    return (
+      <div className={styles.loading}>
+        <Spinner />
+      </div>
+    );
 
   return (
     <>
@@ -41,14 +70,7 @@ export default function Product() {
       </h1>
       <div className={styles.content}>
         <div className={styles.image}>
-          <Image
-            fill
-            src={product.imgUrl}
-            alt={product.name}
-            style={{ objectFit: "cover" }}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            priority
-          />
+          <Image fill src={product.imgUrl} alt={product.name} />
         </div>
         <div>
           <section className={styles.section}>
@@ -102,6 +124,63 @@ export default function Product() {
           </section>
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>사이즈 추천하기</h2>
+            <form className={styles.sizeForm} onSubmit={handleSubmit}>
+              <label className={styles.label}>
+                사이즈
+                <Dropdown
+                  className={styles.input}
+                  name="size"
+                  value={formValue.size}
+                  options={[
+                    { label: "S", value: "S" },
+                    { label: "M", value: "M" },
+                    { label: "L", value: "L" },
+                    { label: "XL", value: "XL" },
+                  ]}
+                  onChange={handleChange}
+                />
+              </label>
+              <label className={styles.label}>
+                성별
+                <Dropdown
+                  className={styles.input}
+                  name="sex"
+                  value={formValue.sex}
+                  onChange={handleChange}
+                  options={[
+                    { label: "남성", value: "male" },
+                    { label: "여성", value: "female" },
+                  ]}
+                />
+              </label>
+              <label className={styles.label}>
+                키
+                <Input
+                  className={styles.input}
+                  name="height"
+                  min="50"
+                  max="200"
+                  type="number"
+                  value={formValue.height}
+                  onChange={handleInputChange}
+                />
+              </label>
+              <label className={styles.label}>
+                사이즈 추천
+                <Dropdown
+                  className={styles.input}
+                  name="fit"
+                  value={formValue.fit}
+                  options={[
+                    { label: "작음", value: "small" },
+                    { label: "적당함", value: "good" },
+                    { label: "큼", value: "big" },
+                  ]}
+                  onChange={handleChange}
+                />
+              </label>
+              <Button className={styles.submit}>작성하기</Button>
+            </form>
           </section>
         </div>
       </div>
